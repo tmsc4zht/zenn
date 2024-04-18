@@ -296,9 +296,9 @@ $$
         \right] 
 
        \right]}
-   }  \cdot \exp{\left(
+   }  \cdot \exp{\left[
     \qform{\theta}{}{\mu} + \frac{\qform{\theta}{\Sigma}{\theta}}{2} 
-   \right)
+   \right]
    } 
 
 
@@ -307,18 +307,110 @@ $$
 
 ここで、積分される関数の形をよく見ると、多変正規分布の確率密度関数と同じ形をしている。
 具体的には、$\mathrm{N}_n(\mu + \Sigma\theta, \Sigma)$の確率密度関数とみなせる。
-分布関数を全域で積分すると1になるので、多次元正規分布の積率母関数は、
+確率分布関数を全域で積分すると1になるので、多次元正規分布の積率母関数は、
 
 $$
 \gdef\t#1{#1^{\mathsf{T}}}
 \gdef\qform#1#2#3{\t{#1}#2#3}
 
-\phi(\theta) = \exp{\left(
+\phi(\theta) = \exp{\left[
     \qform{\theta}{}{\mu} + \frac{\qform{\theta}{\Sigma}{\theta}}{2} 
-   \right)}
+   \right]}
 
 $$
 
 となる。
 
 行列の性質をもっとうまく使えば簡単になる気がする…
+
+## もっと簡単な方法
+
+積率母関数の性質を使う。
+
+### 積率母関数の性質
+
+確率変数ベクトル$X$に対して、確率変数ベクトル$Y$が$Y=AX+b$で定義されているとする。
+このとき$Y$の積率母関数を計算すると、
+
+$$
+\gdef\t#1{#1^{\mathsf{T}}}
+\gdef\qform#1#2#3{\t{#1}#2#3}
+
+\begin{align*} 
+\phi_Y(\theta) = E\left[\exp{\left(\t{\theta}Y\right)}\right]
+ =&  E\left[\exp(\t{\theta}(AX+b))\right] \\
+ =&  \exp{(\t{\theta}b)} \cdot E[\exp{\left( \t{\theta}AX \right)}] \\
+ =&  \exp{(\t{\theta}b)} \cdot E[\exp{\left( \t{(\t{A}\theta)}X \right)}] \\
+ =&  \exp{(\t{\theta}b)} \cdot \phi_X(\t{A}\theta)
+\end{align*} 
+ $$
+
+ となる。
+
+ ### 標準多変量正規分布の積率母関数
+
+ $X$を標準多変量正規分布とすると、その確率密度関数は以下のようになる。
+
+$$
+\gdef\t#1{#1^{\mathsf{T}}}
+\gdef\qform#1#2#3{\t{#1}#2#3}
+f(x) = \frac{1}{(2\pi)^{n/2}}
+       \exp{\left[
+          -\frac{1}{2} \qform{x}{}{x}
+         \right]}
+$$ 
+
+よって、この積率母関数を計算すると、
+
+$$
+\gdef\t#1{#1^{\mathsf{T}}}
+\gdef\qform#1#2#3{\t{#1}#2#3}
+\gdef\nint#1{
+     \overbrace{ \int\dots\int }^n #1 dx_1 \cdots dx_n
+}
+
+\begin{align*} 
+\phi_X(\theta) =& E[e^{\t{\theta}X}] \\
+               =& \nint{ \exp{(\t{\theta}x)} \cdot \frac{1}{(2\pi)^{n/2}} \exp{\left[ -\frac{1}{2} \qform{x}{}{x} \right]} } \\
+               =& \nint{ \frac{1}{(2\pi)^{n/2}} \exp{\left[ \t{\theta}x -\frac{1}{2} \qform{x}{}{x} \right]} } \\
+               =& \nint{ \frac{1}{(2\pi)^{n/2}} \exp{\left[ -\frac{1}{2} (\qform{x}{}{x} -2 \qform{\theta}{}{x}) \right]} } \\
+               =& \nint{ \frac{1}{(2\pi)^{n/2}} \exp{\left[ -\frac{1}{2} \left(\qform{(x-\theta)}{}{(x-\theta)} -\qform{\theta}{\theta} \right) \right]} } \\
+               =& \nint{ \frac{1}{(2\pi)^{n/2}} \exp{\left[ -\frac{1}{2} \left(\qform{(x-\theta)}{}{(x-\theta)} \right) \right]} } \cdot \exp{\left[ \frac{1}{2}\qform{\theta}{}{\theta}\right]} \\
+               =& \exp{\left[ \frac{1}{2}\qform{\theta}{}{\theta}\right]}
+\end{align*} 
+$$ 
+
+となる。最後の積分は$N_n(\theta, I)$の確率密度関数を全体で積分しているので1になることを利用している。
+
+### 標準多変量正規分布と多変量正規分布の関係
+
+多変量正規分布を$Y$と標準多変量正規分布を$X$とすると以下の式が成り立つ。
+
+$$
+Y= \mu + \Sigma^{1/2} X
+$$
+
+### 多変量正規分布の積率母関数
+
+以上のことから、多変量正規分布の積率母関数は
+
+$$
+\gdef\t#1{{#1}^{\mathsf{T}}}
+\gdef\qform#1#2#3{\t{#1}{#2}{#3}}
+\gdef\nint#1{
+     \overbrace{ \int\dots\int }^n #1 dx_1 \cdots dx_n
+}
+
+\begin{align*} 
+\phi_Y(\theta) =& E[e^{\t{\theta}Y}] \\
+ =& \exp{(\qform{\theta}{}{\mu})} \cdot  \phi_X  (\t{\Sigma^{1/2}} \theta) \\
+ =& \exp{(\qform{\theta}{}{\mu})} \cdot  \phi_X  (\Sigma^{1/2} \theta) \\
+ =& \exp{(\qform{\theta}{}{\mu})} \cdot  \exp{\left[\frac{1}{2}\qform{(\Sigma^{1/2}\theta)}{}{(\Sigma^{1/2}\theta)} \right]} \\
+ =& \exp{(\qform{\theta}{}{\mu})} \cdot  \exp{\left[\frac{1}{2}\qform{\theta}{\Sigma}{\theta} \right]}
+\end{align*} 
+$$
+
+となる。
+
+四行で終わってしまった。
+おわり。
